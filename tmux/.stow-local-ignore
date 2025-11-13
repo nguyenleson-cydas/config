@@ -1,0 +1,2 @@
+# Ignore tmux plugin directories (managed by TPM)
+\.config/tmux/plugins
