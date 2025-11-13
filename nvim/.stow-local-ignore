@@ -1,5 +1,6 @@
 # Ignore neovim git directory and generated files
-\.config/nvim/\.git
-\.config/nvim/\.gitignore
-\.config/nvim/\.DS_Store
-\.config/nvim/lazy-lock\.json
+^/\.config/nvim/\.git
+^/\.config/nvim/\.gitignore
+^/\.config/nvim/\.DS_Store
+^/\.config/nvim/lazy-lock\.json
+^/\.config/nvim/\.neoconf\.json

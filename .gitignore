@@ -32,9 +32,11 @@ Temporary Items
 .stow-*
 !.stow-local-ignore
 
-# Neovim - embedded git repository (managed separately)
-nvim/.config/nvim/.git/
-nvim/.config/nvim/.gitignore
+# Neovim - generated/cached files (not tracked)
+nvim/.config/nvim/.DS_Store
+nvim/.config/nvim/lazy-lock.json
+nvim/.config/nvim/.neoconf.json
+nvim/.config/nvim/lazyvim.json
 
 # Tmux plugins - managed by TPM (not tracked)
 tmux/.config/tmux/plugins/
