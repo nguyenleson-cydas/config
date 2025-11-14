@@ -1,4 +1,4 @@
-.PHONY: install uninstall restow install-nvim install-starship install-tmux install-zsh help
+.PHONY: install uninstall restow install-nvim install-starship install-tmux install-zsh install-lazygit help
 
 # Colors for output
 GREEN := \033[0;32m
@@ -6,7 +6,7 @@ YELLOW := \033[0;33m
 NC := \033[0m # No Color
 
 # All packages
-PACKAGES := nvim starship tmux zsh
+PACKAGES := nvim starship tmux zsh lazygit
 
 help: ## Show this help message
 	@echo "Usage: make [target]"
@@ -49,6 +49,11 @@ install-zsh: ## Install only zsh config
 	@stow zsh
 	@echo "${GREEN}✓ zsh installed${NC}"
 
+install-lazygit: ## Install only lazygit config
+	@echo "${GREEN}Installing lazygit...${NC}"
+	@stow lazygit
+	@echo "${GREEN}✓ lazygit installed${NC}"
+
 uninstall-nvim: ## Uninstall neovim config
 	@echo "${YELLOW}Uninstalling nvim...${NC}"
 	@stow -D nvim
@@ -68,6 +73,11 @@ uninstall-zsh: ## Uninstall zsh config
 	@echo "${YELLOW}Uninstalling zsh...${NC}"
 	@stow -D zsh
 	@echo "${YELLOW}✓ zsh uninstalled${NC}"
+
+uninstall-lazygit: ## Uninstall lazygit config
+	@echo "${YELLOW}Uninstalling lazygit...${NC}"
+	@stow -D lazygit
+	@echo "${YELLOW}✓ lazygit uninstalled${NC}"
 
 check: ## Check for conflicts before installing
 	@echo "${GREEN}Checking for conflicts...${NC}"
