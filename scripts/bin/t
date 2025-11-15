@@ -1,0 +1,23 @@
+#!/bin/bash
+
+selected=$(find "$HOME"/dev/ -type d -maxdepth 2 | fzf --prompt="Select a directory: " --layout=reverse)
+
+# Exit if no directory was selected
+if [[ -z "$selected" ]]; then
+  exit 0
+fi
+
+session_name=$(basename "$selected")
+
+if [[ -z "$TMUX" ]]; then
+  # Outside tmux
+  tmux new-session -A -s "$session_name" -c "$selected"
+else
+  # Inside tmux
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    tmux switch-client -t "$session_name"
+  else
+    tmux new-session -d -s "$session_name" -c "$selected"
+    tmux switch-client -t "$session_name"
+  fi
+fi

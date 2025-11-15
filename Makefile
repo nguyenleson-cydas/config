@@ -1,4 +1,4 @@
-.PHONY: install uninstall restow install-nvim install-starship install-tmux install-zsh install-lazygit install-ghostty help
+.PHONY: install uninstall restow install-nvim install-starship install-tmux install-zsh install-lazygit install-ghostty install-scripts help
 
 # Colors for output
 GREEN := \033[0;32m
@@ -6,7 +6,7 @@ YELLOW := \033[0;33m
 NC := \033[0m # No Color
 
 # All packages
-PACKAGES := nvim starship tmux zsh lazygit ghostty
+PACKAGES := nvim starship tmux zsh lazygit ghostty scripts
 
 help: ## Show this help message
 	@echo "Usage: make [target]"
@@ -59,6 +59,11 @@ install-ghostty: ## Install only ghostty config
 	@stow ghostty
 	@echo "${GREEN}✓ ghostty installed${NC}"
 
+install-scripts: ## Install only scripts
+	@echo "${GREEN}Installing scripts...${NC}"
+	@stow scripts
+	@echo "${GREEN}✓ scripts installed${NC}"
+
 uninstall-nvim: ## Uninstall neovim config
 	@echo "${YELLOW}Uninstalling nvim...${NC}"
 	@stow -D nvim
@@ -88,6 +93,11 @@ uninstall-ghostty: ## Uninstall ghostty config
 	@echo "${YELLOW}Uninstalling ghostty...${NC}"
 	@stow -D ghostty
 	@echo "${YELLOW}✓ ghostty uninstalled${NC}"
+
+uninstall-scripts: ## Uninstall scripts
+	@echo "${YELLOW}Uninstalling scripts...${NC}"
+	@stow -D scripts
+	@echo "${YELLOW}✓ scripts uninstalled${NC}"
 
 check: ## Check for conflicts before installing
 	@echo "${GREEN}Checking for conflicts...${NC}"
