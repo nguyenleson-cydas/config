@@ -7,6 +7,9 @@ if ! tmux has -t "$session" 2>/dev/null; then
   tmux set-option -s -t "$session_id" key-table popup
   tmux set-option -s -t "$session_id" status off
   tmux set-option -s -t "$session_id" prefix None
+  tmux set-option -s -t "$session_id" pane-border-status off
+  tmux set-option -s -t "$session_id" pane-border-style "fg=default,bg=default"
+  tmux set-option -s -t "$session_id" pane-active-border-style "fg=default,bg=default"
   session="$session_id"
 fi
 
