@@ -2,8 +2,8 @@
 
 
 theme = "Solarized Dark Patched"
-background-opacity = 0.9
-background-blur-radius = 20
+background-opacity = 0.75
+background-blur-radius = 0
 background = #031219
 macos-titlebar-style = hidden
 font-family = "PlemolJP Console NF"

@@ -74,8 +74,8 @@ alias ca='cursor-agent'
 
 # alias phpstan='docker run -v $PWD:/app --rm ghcr.io/phpstan/phpstan'
 
-alias us='cd $HOME/dev/intern/uranus/app/vue && ASDF_NODEJS_VERSION=10.15.2 NODE_OPTIONS='--max-old-space-size=10240' npm start'
-alias uw='cd $HOME/dev/intern/uranus/app/vue && ASDF_NODEJS_VERSION=10.15.2 npm run watch'
+alias us='ASDF_NODEJS_VERSION=10.15.2 npm --prefix $HOME/dev/intern/uranus/app/vue start'
+alias uw='ASDF_NODEJS_VERSION=10.15.2 npm --prefix $HOME/dev/intern/uranus/app/vue run watch'
 
 # Path
 export PATH="$HOME/.local/share/bob/nvim-bin:${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$HOME/.local/bin:$HOME/bin:$PATH"
