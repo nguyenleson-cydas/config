@@ -1,6 +1,6 @@
 return {
   "b0o/incline.nvim",
-  dependencies = { "craftzdog/solarized-osaka.nvim" },
+  dependencies = { "craftzdog/solarized-osaka.nvim", "nvim-tree/nvim-web-devicons" },
   event = "BufReadPre",
   priority = 1200,
   config = function()
