@@ -20,7 +20,7 @@ return {
     formatters = {
       php_cs_fixer_uranus = {
         command = "php",
-        args = { vim.fn.expand("~/php-cs-fixer-v2.phar"), "fix", "$FILENAME", "--config=.php_cs.dist" },
+        args = { vim.fn.expand("~/bin/php-cs-fixer-v2.phar"), "fix", "$FILENAME", "--config=.php_cs.dist" },
         stdin = false,
       },
     },
