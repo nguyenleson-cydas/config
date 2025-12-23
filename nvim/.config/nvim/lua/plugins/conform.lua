@@ -1,4 +1,7 @@
-local uranus_root = vim.fn.expand("~/dev/intern/uranus/") -- change to your actual project path
+local projects_using_v2 = {
+  vim.fn.expand("~/dev/intern/uranus/"),
+  vim.fn.expand("~/learning/cake-crud/"),
+}
 
 return {
   "stevearc/conform.nvim",
@@ -6,19 +9,19 @@ return {
     formatters_by_ft = {
       php = function(bufnr)
         local filepath = vim.api.nvim_buf_get_name(bufnr)
-        if vim.startswith(filepath, uranus_root) then
-          return { "php_cs_fixer_uranus" }
-        else
-          -- Return nil or a different formatter for other projects
-          return { "php_cs_fixer" }
+        for _, project_root in ipairs(projects_using_v2) do
+          if vim.startswith(filepath, project_root) then
+            return { "php_cs_fixer_v2" }
+          end
         end
+        return { "php_cs_fixer" }
       end,
     },
     default_format_opts = {
       timeout_ms = 10000,
     },
     formatters = {
-      php_cs_fixer_uranus = {
+      php_cs_fixer_v2 = {
         command = "php",
         args = { vim.fn.expand("~/bin/php-cs-fixer-v2.phar"), "fix", "$FILENAME", "--config=.php_cs.dist" },
         stdin = false,
