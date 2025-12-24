@@ -54,6 +54,18 @@ vim.keymap.set('n', '<C-S-k>', '<C-w>K', { desc = 'Move window to the upper' })
 
 vim.keymap.set('n', '\\', '<cmd>Explore %:p:h<CR>', { desc = 'Open file explorer in current file directory' })
 
+vim.keymap.set('n', '<leader>yp', function()
+  local path = vim.fn.expand '%'
+  vim.fn.setreg('+', path)
+  vim.notify('Copied relative path: ' .. path, vim.log.levels.INFO)
+end, { desc = '[Y]ank [P]ath (relative)' })
+
+vim.keymap.set('n', '<leader>yP', function()
+  local path = vim.fn.expand '%:p'
+  vim.fn.setreg('+', path)
+  vim.notify('Copied absolute path: ' .. path, vim.log.levels.INFO)
+end, { desc = '[Y]ank [P]ath (absolute)' })
+
 vim.keymap.set('n', 'K', function()
   vim.lsp.buf.hover {
     focus = true,
@@ -119,6 +131,7 @@ vim.pack.add {
   'https://github.com/mfussenegger/nvim-dap.git',
   'https://github.com/jay-babu/mason-nvim-dap.nvim.git',
   'https://github.com/zbirenbaum/copilot.lua.git',
+  'https://github.com/prichrd/netrw.nvim.git',
 }
 
 require('gitsigns').setup {
@@ -422,6 +435,7 @@ local ensure_installed = {
   'prettierd',
   'php-cs-fixer',
   'markdownlint',
+  'sqlfluff',
 }
 
 vim.lsp.config('lua_ls', lua_ls_config)
@@ -447,18 +461,15 @@ require('conform').setup {
       return nil
     else
       return {
-        timeout_ms = 500,
+        timeout_ms = 10000,
         lsp_format = 'fallback',
       }
     end
   end,
   formatters_by_ft = {
     lua = { 'stylua' },
-    -- Conform can also run multiple formatters sequentially
-    -- python = { "isort", "black" },
-    --
-    -- You can use 'stop_after_first' to run the first available formatter from the list
     javascript = { 'prettierd', 'prettier', stop_after_first = true },
+    sql = { 'sql' },
     vue = { 'prettierd', 'prettier', stop_after_first = true },
     php = function(bufnr)
       local filepath = vim.api.nvim_buf_get_name(bufnr)
@@ -475,6 +486,17 @@ require('conform').setup {
       command = 'php',
       args = { vim.fn.expand '~/bin/php-cs-fixer-v2.phar', 'fix', '$FILENAME', '--config=.php_cs.dist' },
       stdin = false,
+    },
+    sql = {
+      command = 'sh',
+      args = {
+        '-c',
+        '/opt/homebrew/bin/sqlfluff fix --dialect mysql "$1" || true',
+        'sh',
+        '$FILENAME',
+      },
+      stdin = false,
+      require_cwd = false,
     },
   },
 }
@@ -556,16 +578,8 @@ require('mini.ai').setup { n_lines = 500 }
 -- - sr)'  - [S]urround [R]eplace [)] [']
 require('mini.surround').setup()
 
--- Simple and easy statusline.
---  You could remove this setup call if you don't like it,
---  and try some other statusline plugin
 local statusline = require 'mini.statusline'
--- set use_icons to true if you have a Nerd Font
 statusline.setup { use_icons = vim.g.have_nerd_font }
-
--- You can configure sections in the statusline by overriding their
--- default behavior. For example, here we set the section for
--- cursor location to LINE:COLUMN
 ---@diagnostic disable-next-line: duplicate-set-field
 statusline.section_location = function()
   return '%2l:%-2v'
@@ -616,8 +630,19 @@ require('guess-indent').setup {}
 require('nvim-autopairs').setup {}
 
 local lint = require 'lint'
+local phpstan = lint.linters.phpstan
+local sqlfluff = lint.linters.sqlfluff
+phpstan.args = {
+  'analyse',
+  '--error-format=json',
+  '--memory-limit=1G',
+  '--no-progress',
+}
+sqlfluff.args = { 'lint', '--format', 'json', '--dialect', 'mysql', '-' }
 lint.linters_by_ft = {
   markdown = { 'markdownlint' },
+  sql = { 'sqlfluff' },
+  php = { 'phpstan' },
 }
 local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
@@ -729,35 +754,92 @@ require('copilot').setup {
 -- [[ Anti-spam discipline for h,j,k,l per buffer ]]
 local nav_tracker = {}
 local NAV_KEYS = { 'h', 'j', 'k', 'l', '+', '-' }
-local SPAM_THRESHOLD = 10 -- Số lần nhấn liên tiếp trước khi cảnh báo
-local SPAM_WINDOW_MS = 2000 -- Cửa sổ thời gian để tính liên tiếp
-local MIN_INTERVAL_MS = 90 -- Không cho nhấn nhanh hơn X ms
-local BLOCK_DURATION_MS = 5000 -- Block di chuyển trong X ms sau khi vượt ngưỡng
+local SPAM_THRESHOLD = 10
+local WARNING_THRESHOLD = 7
+local SPAM_WINDOW_MS = 2000
+local MIN_INTERVAL_MS = 90
+local BLOCK_DURATION_MS = 5000
+local CLEANUP_INTERVAL_MS = 300000
+local EXEMPT_FILETYPES = { 'qf', 'help', 'man', 'nofile', 'prompt' }
+local EXEMPT_BUFTYPES = { 'nofile', 'quickfix', 'help', 'prompt' }
+local OPPOSITE_KEYS = {
+  h = 'l',
+  l = 'h',
+  j = 'k',
+  k = 'j',
+  ['+'] = '-',
+  ['-'] = '+',
+}
+
+local function should_exempt(bufnr)
+  local buftype = vim.bo[bufnr].buftype
+  local filetype = vim.bo[bufnr].filetype
+  for _, exempt in ipairs(EXEMPT_BUFTYPES) do
+    if buftype == exempt then
+      return true
+    end
+  end
+  for _, exempt in ipairs(EXEMPT_FILETYPES) do
+    if filetype == exempt then
+      return true
+    end
+  end
+  return false
+end
 
 local function get_nav_state(bufnr)
   if not nav_tracker[bufnr] then
-    nav_tracker[bufnr] = { count = 0, last_time = 0, blocked_until = 0 }
+    nav_tracker[bufnr] = { count = 0, last_time = 0, blocked_until = 0, last_key = nil, last_access = vim.loop.now() }
   end
+  nav_tracker[bufnr].last_access = vim.loop.now()
   return nav_tracker[bufnr]
+end
+
+local function cleanup_old_states()
+  local now = vim.loop.now()
+  for bufnr, state in pairs(nav_tracker) do
+    if not vim.api.nvim_buf_is_valid(bufnr) or (now - state.last_access) > CLEANUP_INTERVAL_MS then
+      nav_tracker[bufnr] = nil
+    end
+  end
 end
 
 local function on_nav_press(key)
   local bufnr = vim.api.nvim_get_current_buf()
+
+  if should_exempt(bufnr) then
+    return key
+  end
+
   local state = get_nav_state(bufnr)
   local now = vim.loop.now()
 
-  if state.blocked_until and now < state.blocked_until and vim.bo.buftype ~= 'nofile' then
+  if now % 10000 < 100 then
+    cleanup_old_states()
+  end
+
+  if state.blocked_until and now < state.blocked_until then
+    local remaining = math.ceil((state.blocked_until - now) / 1000)
+    if remaining % 2 == 0 then
+      vim.notify(string.format('🤠 Blocked for %ds more...', remaining), vim.log.levels.WARN)
+    end
     return
   end
 
   if vim.v.count > 0 then
     state.count = 0
     state.last_time = now
+    state.last_key = nil
     return key
+  end
+
+  if state.last_key and OPPOSITE_KEYS[state.last_key] == key then
+    state.count = 0
   end
 
   if now - state.last_time < MIN_INTERVAL_MS then
     state.last_time = now
+    state.last_key = key
     return key
   end
 
@@ -767,11 +849,15 @@ local function on_nav_press(key)
 
   state.count = state.count + 1
   state.last_time = now
+  state.last_key = key
 
-  if state.count >= SPAM_THRESHOLD and vim.bo.buftype ~= 'nofile' then
+  if state.count >= SPAM_THRESHOLD then
     state.blocked_until = now + BLOCK_DURATION_MS
-    vim.notify('🤠 Hold it Cowboy!', vim.log.levels.WARN)
+    vim.notify('🤠 Hold it Cowboy! Blocked for 5s', vim.log.levels.WARN)
     return
+  elseif state.count >= WARNING_THRESHOLD then
+    local remaining = SPAM_THRESHOLD - state.count
+    vim.notify(string.format('⚠️ Slow down! %d more = block', remaining), vim.log.levels.INFO)
   end
 
   return key
