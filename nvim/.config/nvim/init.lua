@@ -66,6 +66,10 @@ vim.keymap.set('n', '<leader>yP', function()
   vim.notify('Copied absolute path: ' .. path, vim.log.levels.INFO)
 end, { desc = '[Y]ank [P]ath (absolute)' })
 
+vim.keymap.set('n', '<leader>pu', function()
+  vim.pack.update()
+end, { desc = '[P]ack [U]pdate' })
+
 vim.keymap.set('n', 'K', function()
   vim.lsp.buf.hover {
     focus = true,
