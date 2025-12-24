@@ -175,12 +175,11 @@ vim.pack.add {
   'https://github.com/rafamadriz/friendly-snippets.git',
   {
     src = 'https://github.com/L3MON4D3/LuaSnip.git',
-    version = 'v2.4.1',
-    -- make install_jsregexp
+    version = vim.version.range '^2',
   },
   {
     src = 'https://github.com/saghen/blink.cmp.git',
-    version = 'v1.8.0',
+    version = vim.version.range '^1',
   },
   'https://github.com/neovim/nvim-lspconfig.git',
   'https://github.com/mason-org/mason.nvim.git',
@@ -252,17 +251,17 @@ require('gitsigns').setup {
     map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
     map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
     map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
-    map('n', '<leader>hu', gitsigns.stage_hunk, { desc = 'git [u]ndo stage hunk' })
     map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
     map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
+    map('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'git hunk [I]nline preview' })
     map('n', '<leader>hb', gitsigns.blame_line, { desc = 'git [b]lame line' })
     map('n', '<leader>hd', gitsigns.diffthis, { desc = 'git [d]iff against index' })
     map('n', '<leader>hD', function()
-      gitsigns.diffthis '@'
+      gitsigns.diffthis '~'
     end, { desc = 'git [D]iff against last commit' })
     -- Toggles
     map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
-    map('n', '<leader>tD', gitsigns.preview_hunk_inline, { desc = '[T]oggle git show [D]eleted' })
+    map('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = '[T]oggle git [W]ord diff' })
   end,
 }
 
@@ -574,66 +573,77 @@ require('conform').setup {
   },
 }
 
-require('luasnip.loaders.from_vscode').lazy_load()
-require('blink-cmp').setup {
-  keymap = {
-    --   <c-y> to accept ([y]es) the completion.
-    --    This will auto-import if your LSP supports it.
-    --    This will expand snippets if the LSP sent a snippet.
-    -- 'super-tab' for tab to accept
-    -- 'enter' for enter to accept
-    -- 'none' for no mappings
-    -- For an understanding of why the 'default' preset is recommended,
-    -- you will need to read `:help ins-completion`
-    -- <tab>/<s-tab>: move to right/left of your snippet expansion
-    -- <c-space>: Open menu or open docs if already open
-    -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
-    -- <c-e>: Hide menu
-    -- <c-k>: Toggle signature help
-    --
-    -- See :h blink-cmp-config-keymap for defining your own keymap
-    preset = 'default',
+local group = vim.api.nvim_create_augroup('BlinkCmpLazyLoad', { clear = true })
+vim.api.nvim_create_autocmd('InsertEnter', {
+  pattern = '*',
+  once = true,
+  group = group,
+  callback = function()
+    require('luasnip.loaders.from_vscode').lazy_load()
+    require('blink-cmp').setup {
+      keymap = {
+        -- you will need to read `:help ins-completion`
+        -- See :h blink-cmp-config-keymap for defining your own keymap
+        -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
+        --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+        preset = 'default',
+      },
+      appearance = {
+        nerd_font_variant = 'mono',
+      },
+      completion = {
+        documentation = {
+          auto_show = false,
+          auto_show_delay_ms = 500,
+        },
+      },
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        providers = {
+          lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+        },
+      },
+      snippets = { preset = 'luasnip' },
+      -- See :h blink-cmp-config-fuzzy for more information
+      fuzzy = { implementation = 'prefer_rust_with_warning' },
+      signature = { enabled = true },
+    }
+  end,
+})
 
-    -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-    --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
-  },
+local function build_luasnip()
+  local data_home = vim.fn.stdpath 'data' -- usually ~/.local/share/nvim
+  local dir = data_home .. '/site/pack/core/opt/LuaSnip'
 
-  appearance = {
-    -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-    -- Adjusts spacing to ensure icons are aligned
-    nerd_font_variant = 'mono',
-  },
+  if vim.fn.isdirectory(dir) == 0 then
+    vim.notify('LuaSnip directory not found: ' .. dir, vim.log.levels.WARN)
+    return
+  end
 
-  completion = {
-    -- By default, you may press `<c-space>` to show the documentation.
-    -- Optionally, set `auto_show = true` to show the documentation after a delay.
-    documentation = {
-      auto_show = false,
-      auto_show_delay_ms = 500,
-    },
-  },
+  vim.notify('Building LuaSnip (make install_jsregexp)...', vim.log.levels.INFO)
 
-  sources = {
-    default = { 'lsp', 'path', 'snippets', 'lazydev' },
-    providers = {
-      lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
-    },
-  },
+  vim.system({ 'make', 'install_jsregexp' }, { cwd = dir }, function(res)
+    if res.code == 0 then
+      vim.schedule(function()
+        vim.notify('LuaSnip build completed', vim.log.levels.INFO)
+      end)
+    else
+      vim.schedule(function()
+        vim.notify('LuaSnip build failed: ' .. (res.stderr or ''), vim.log.levels.ERROR)
+      end)
+    end
+  end)
+end
 
-  snippets = { preset = 'luasnip' },
-
-  -- Blink.cmp includes an optional, recommended rust fuzzy matcher,
-  -- which automatically downloads a prebuilt binary when enabled.
-  --
-  -- By default, we use the Lua implementation instead, but you may enable
-  -- the rust implementation via `'prefer_rust_with_warning'`
-  --
-  -- See :h blink-cmp-config-fuzzy for more information
-  fuzzy = { implementation = 'prefer_rust_with_warning' },
-
-  -- Shows a signature help window while you type arguments for a function
-  signature = { enabled = true },
-}
+vim.api.nvim_create_autocmd('PackChanged', {
+  group = vim.api.nvim_create_augroup('luasnip-build-on-pack-changed', { clear = true }),
+  callback = function(ev)
+    -- adjust this check if the name is different in your setup
+    if ev.data and ev.data.name == 'LuaSnip' and ev.data.kind == 'update' then
+      build_luasnip()
+    end
+  end,
+})
 
 require('todo-comments').setup { signs = false }
 -- Better Around/Inside textobjects
