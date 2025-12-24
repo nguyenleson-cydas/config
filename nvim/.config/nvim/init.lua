@@ -63,6 +63,12 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+vim.keymap.set('n', '<C-h>', '<cmd><C-U>TmuxNavigateLeft<CR>', { silent = true, desc = 'Tmux/Vim navigate left' })
+vim.keymap.set('n', '<C-j>', '<cmd><C-U>TmuxNavigateDown<CR>', { silent = true, desc = 'Tmux/Vim navigate down' })
+vim.keymap.set('n', '<C-k>', '<cmd><C-U>TmuxNavigateUp<CR>', { silent = true, desc = 'Tmux/Vim navigate up' })
+vim.keymap.set('n', '<C-l>', '<cmd><C-U>TmuxNavigateRight<CR>', { silent = true, desc = 'Tmux/Vim navigate right' })
+vim.keymap.set('n', '<C-\\>', '<cmd><C-U>TmuxNavigatePrevious<CR>', { silent = true, desc = 'Tmux/Vim navigate previous' })
+
 vim.keymap.set('n', '<C-S-h>', '<C-w>H', { desc = 'Move window to the left' })
 vim.keymap.set('n', '<C-S-l>', '<C-w>L', { desc = 'Move window to the right' })
 vim.keymap.set('n', '<C-S-j>', '<C-w>J', { desc = 'Move window to the lower' })
@@ -188,7 +194,6 @@ vim.pack.add {
     src = 'https://github.com/nvim-treesitter/nvim-treesitter.git',
     version = 'master',
   },
-  -- build = ':TSUpdate'
   'https://github.com/craftzdog/solarized-osaka.nvim.git',
   'https://github.com/christoomey/vim-tmux-navigator.git',
   'https://github.com/NMAC427/guess-indent.nvim.git',
@@ -695,11 +700,20 @@ require('nvim-treesitter.configs').setup {
   indent = { enable = true, disable = { 'ruby' } },
 }
 
-vim.keymap.set('n', '<C-h>', '<cmd><C-U>TmuxNavigateLeft<CR>', { silent = true, desc = 'Tmux/Vim navigate left' })
-vim.keymap.set('n', '<C-j>', '<cmd><C-U>TmuxNavigateDown<CR>', { silent = true, desc = 'Tmux/Vim navigate down' })
-vim.keymap.set('n', '<C-k>', '<cmd><C-U>TmuxNavigateUp<CR>', { silent = true, desc = 'Tmux/Vim navigate up' })
-vim.keymap.set('n', '<C-l>', '<cmd><C-U>TmuxNavigateRight<CR>', { silent = true, desc = 'Tmux/Vim navigate right' })
-vim.keymap.set('n', '<C-\\>', '<cmd><C-U>TmuxNavigatePrevious<CR>', { silent = true, desc = 'Tmux/Vim navigate previous' })
+vim.api.nvim_create_autocmd('PackChanged', {
+  desc = 'Handle nvim-treesitter updates',
+  group = vim.api.nvim_create_augroup('nvim-treesitter-pack-changed-update-handler', { clear = true }),
+  callback = function(event)
+    if event.data.kind == 'update' then
+      local ok = pcall(vim.cmd, 'TSUpdate')
+      if ok then
+        vim.notify('TSUpdate completed successfully!', vim.log.levels.INFO)
+      else
+        vim.notify('TSUpdate command not available yet, skipping', vim.log.levels.WARN)
+      end
+    end
+  end,
+})
 
 require('guess-indent').setup {}
 require('nvim-autopairs').setup {}
