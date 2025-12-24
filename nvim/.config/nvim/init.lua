@@ -32,6 +32,22 @@ vim.g.netrw_preview = 1
 vim.g.netrw_winsize = 30
 vim.g.netrw_bufsettings = 'noma nomod nonu nobl nowrap ro rnu'
 
+vim.opt.conceallevel = 2
+vim.wo.foldmethod = 'expr'
+vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt.foldlevel = 99
+vim.cmd [[let &t_Cs = "\e[4:3m"]]
+vim.cmd [[let &t_Ce = "\e[4:0m"]]
+vim.opt.spell = true
+vim.opt.spelllang = { 'en_us', 'cjk' }
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'json', 'jsonc', 'markdown' },
+  callback = function()
+    vim.wo.conceallevel = 0
+  end,
+})
+
 -- [[ Basic Keymaps ]]
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -52,6 +68,25 @@ vim.keymap.set('n', '<C-S-l>', '<C-w>L', { desc = 'Move window to the right' })
 vim.keymap.set('n', '<C-S-j>', '<C-w>J', { desc = 'Move window to the lower' })
 vim.keymap.set('n', '<C-S-k>', '<C-w>K', { desc = 'Move window to the upper' })
 
+-- Move Lines
+vim.keymap.set('n', '<A-j>', "<cmd>execute 'move .+' . v:count1<cr>==", { desc = 'Move Down' })
+vim.keymap.set('n', '<A-k>', "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = 'Move Up' })
+vim.keymap.set('i', '<A-j>', '<esc><cmd>m .+1<cr>==gi', { desc = 'Move Down' })
+vim.keymap.set('i', '<A-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move Up' })
+vim.keymap.set('v', '<A-j>', ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = 'Move Down' })
+vim.keymap.set('v', '<A-k>', ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = 'Move Up' })
+
+-- better indenting
+vim.keymap.set('x', '<', '<gv')
+vim.keymap.set('x', '>', '>gv')
+
+vim.keymap.set('n', 'n', "'Nn'[v:searchforward].'zv'", { expr = true, desc = 'Next Search Result' })
+vim.keymap.set('x', 'n', "'Nn'[v:searchforward]", { expr = true, desc = 'Next Search Result' })
+vim.keymap.set('o', 'n', "'Nn'[v:searchforward]", { expr = true, desc = 'Next Search Result' })
+vim.keymap.set('n', 'N', "'nN'[v:searchforward].'zv'", { expr = true, desc = 'Prev Search Result' })
+vim.keymap.set('x', 'N', "'nN'[v:searchforward]", { expr = true, desc = 'Prev Search Result' })
+vim.keymap.set('o', 'N', "'nN'[v:searchforward]", { expr = true, desc = 'Prev Search Result' })
+
 vim.keymap.set('n', '\\', '<cmd>Explore %:p:h<CR>', { desc = 'Open file explorer in current file directory' })
 
 vim.keymap.set('n', '<leader>yp', function()
@@ -67,8 +102,37 @@ vim.keymap.set('n', '<leader>yP', function()
 end, { desc = '[Y]ank [P]ath (absolute)' })
 
 vim.keymap.set('n', '<leader>pu', function()
-  vim.pack.update()
+  vim.pack.update(nil, { force = true })
 end, { desc = '[P]ack [U]pdate' })
+
+vim.keymap.set('n', '<leader>pc', function()
+  local function get_folders(path)
+    local folders = {}
+    local entries = vim.fn.readdir(path)
+
+    for _, entry in ipairs(entries) do
+      local full_path = path .. '/' .. entry
+      if vim.fn.isdirectory(full_path) == 1 then
+        table.insert(folders, entry)
+      end
+    end
+
+    return folders
+  end
+  local data_home = vim.fn.expand '~/.local/share'
+  local pack_path = data_home .. '/nvim/site/pack/core/opt'
+  local folders = get_folders(pack_path)
+  vim.ui.select(folders, {
+    prompt = 'Select a package to clean:',
+  }, function(choice)
+    if choice then
+      vim.pack.del { choice }
+      vim.notify('Deleted package: ' .. choice, vim.log.levels.INFO)
+    else
+      vim.notify('Package clean cancelled', vim.log.levels.INFO)
+    end
+  end)
+end, { desc = '[P]ack [C]lean' })
 
 vim.keymap.set('n', 'K', function()
   vim.lsp.buf.hover {
@@ -237,6 +301,7 @@ require('which-key').setup {
     { '<leader>s', group = '[S]earch' },
     { '<leader>t', group = '[T]oggle' },
     { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+    { '<leader>p', group = 'Vim [P]ack' },
   },
 }
 
@@ -619,6 +684,13 @@ require('nvim-treesitter.configs').setup {
     --  If you are experiencing weird indenting issues, add the language to
     --  the list of additional_vim_regex_highlighting and disabled languages for indent.
     additional_vim_regex_highlighting = { 'ruby' },
+    disable = function(lang, buf)
+      local max_filesize = 100 * 1024 -- 100 KB
+      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      if ok and stats and stats.size > max_filesize then
+        return true
+      end
+    end,
   },
   indent = { enable = true, disable = { 'ruby' } },
 }
