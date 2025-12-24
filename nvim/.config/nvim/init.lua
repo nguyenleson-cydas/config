@@ -1,6 +1,5 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
 vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
@@ -206,6 +205,7 @@ vim.pack.add {
   'https://github.com/mfussenegger/nvim-dap.git',
   'https://github.com/jay-babu/mason-nvim-dap.nvim.git',
   'https://github.com/zbirenbaum/copilot.lua.git',
+  'https://github.com/tpope/vim-dadbod.git',
 }
 
 require('gitsigns').setup {
