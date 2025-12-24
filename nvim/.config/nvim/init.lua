@@ -1,3 +1,44 @@
+-- [[ Plugin Management with vim.pack ]]
+vim.pack.add {
+  'https://github.com/lewis6991/gitsigns.nvim.git',
+  'https://github.com/folke/which-key.nvim.git',
+  'https://github.com/nvim-lua/plenary.nvim.git',
+  'https://github.com/folke/lazydev.nvim.git',
+  'https://github.com/j-hui/fidget.nvim.git',
+  'https://github.com/rafamadriz/friendly-snippets.git',
+  {
+    src = 'https://github.com/L3MON4D3/LuaSnip.git',
+    version = vim.version.range '^2',
+  },
+  {
+    src = 'https://github.com/saghen/blink.cmp.git',
+    version = vim.version.range '^1',
+  },
+  'https://github.com/neovim/nvim-lspconfig.git',
+  'https://github.com/mason-org/mason.nvim.git',
+  'https://github.com/mason-org/mason-lspconfig.nvim.git',
+  'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim.git',
+  'https://github.com/stevearc/conform.nvim.git',
+  'https://github.com/mfussenegger/nvim-lint.git',
+  'https://github.com/folke/todo-comments.nvim.git',
+  'https://github.com/nvim-mini/mini.nvim.git',
+  {
+    src = 'https://github.com/nvim-treesitter/nvim-treesitter.git',
+    version = 'master',
+  },
+  'https://github.com/craftzdog/solarized-osaka.nvim.git',
+  'https://github.com/christoomey/vim-tmux-navigator.git',
+  'https://github.com/NMAC427/guess-indent.nvim.git',
+  'https://github.com/rcarriga/nvim-dap-ui.git',
+  'https://github.com/theHamsta/nvim-dap-virtual-text.git',
+  'https://github.com/nvim-neotest/nvim-nio.git',
+  'https://github.com/mfussenegger/nvim-dap.git',
+  'https://github.com/jay-babu/mason-nvim-dap.nvim.git',
+  'https://github.com/zbirenbaum/copilot.lua.git',
+  'https://github.com/tpope/vim-dadbod.git',
+  'https://github.com/folke/snacks.nvim.git',
+}
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
@@ -153,8 +194,6 @@ vim.keymap.set('n', 'K', function()
   }
 end)
 
--- [[ Anti-spam discipline for h,j,k,l ]]
-
 -- [[ Basic Autocommands ]]
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
@@ -165,49 +204,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- [[ Configure and install plugins ]]
-vim.pack.add {
-  'https://github.com/lewis6991/gitsigns.nvim.git',
-  'https://github.com/folke/which-key.nvim.git',
-  'https://github.com/nvim-lua/plenary.nvim.git',
-  'https://github.com/nvim-telescope/telescope-fzf-native.nvim.git',
-  'https://github.com/nvim-telescope/telescope.nvim.git',
-  'https://github.com/nvim-telescope/telescope-ui-select.nvim.git',
-  'https://github.com/folke/lazydev.nvim.git',
-  'https://github.com/j-hui/fidget.nvim.git',
-  'https://github.com/rafamadriz/friendly-snippets.git',
-  {
-    src = 'https://github.com/L3MON4D3/LuaSnip.git',
-    version = vim.version.range '^2',
-  },
-  {
-    src = 'https://github.com/saghen/blink.cmp.git',
-    version = vim.version.range '^1',
-  },
-  'https://github.com/neovim/nvim-lspconfig.git',
-  'https://github.com/mason-org/mason.nvim.git',
-  'https://github.com/mason-org/mason-lspconfig.nvim.git',
-  'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim.git',
-  'https://github.com/stevearc/conform.nvim.git',
-  'https://github.com/mfussenegger/nvim-lint.git',
-  'https://github.com/folke/todo-comments.nvim.git',
-  'https://github.com/nvim-mini/mini.nvim.git',
-  {
-    src = 'https://github.com/nvim-treesitter/nvim-treesitter.git',
-    version = 'master',
-  },
-  'https://github.com/craftzdog/solarized-osaka.nvim.git',
-  'https://github.com/christoomey/vim-tmux-navigator.git',
-  'https://github.com/NMAC427/guess-indent.nvim.git',
-  'https://github.com/windwp/nvim-autopairs.git',
-  'https://github.com/rcarriga/nvim-dap-ui.git',
-  'https://github.com/theHamsta/nvim-dap-virtual-text.git',
-  'https://github.com/nvim-neotest/nvim-nio.git',
-  'https://github.com/mfussenegger/nvim-dap.git',
-  'https://github.com/jay-babu/mason-nvim-dap.nvim.git',
-  'https://github.com/zbirenbaum/copilot.lua.git',
-  'https://github.com/tpope/vim-dadbod.git',
-}
-
 require('gitsigns').setup {
   signs = {
     add = { text = '+' },
@@ -312,62 +308,202 @@ require('which-key').setup {
   },
 }
 
-require('telescope').setup {
-  defaults = {
-    mappings = {},
-    pickers = {},
-    extensions = {
-      ['ui-select'] = {
-        require('telescope.themes').get_dropdown(),
-      },
-      fzf = {
-        fuzzy = true,
-        override_generic_sorter = true,
-        override_file_sorter = true,
-        case_mode = 'smart_case',
-      },
-    },
-  },
+require('snacks').setup {
+  bigfile = { enabled = true },
+  input = { enabled = true },
+  picker = { enabled = true },
+  notifier = { enabled = true },
+  quickfile = { enabled = true },
+  scope = { enabled = true },
+  scroll = { enabled = true },
+  statuscolumn = { enabled = true },
+  words = { enabled = true },
 }
 
-pcall(require('telescope').load_extension, 'fzf')
-pcall(require('telescope').load_extension, 'ui-select')
-
-local builtin = require 'telescope.builtin'
-vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sF', function()
-  builtin.find_files {
-    no_ignore = false,
-    hidden = true,
-  }
-end, { desc = '[S]earch [^F]iles, respects .gitignore' })
-vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-
+-- Top Pickers & Explorer
+vim.keymap.set('n', '<leader><space>', function()
+  Snacks.picker.smart()
+end, { desc = 'Smart Find Files' })
+vim.keymap.set('n', '<leader>,', function()
+  Snacks.picker.buffers()
+end, { desc = 'Buffers' })
 vim.keymap.set('n', '<leader>/', function()
-  builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
-end, { desc = '[/] Fuzzily search in current buffer' })
+  Snacks.picker.grep()
+end, { desc = 'Grep' })
+vim.keymap.set('n', '<leader>:', function()
+  Snacks.picker.command_history()
+end, { desc = 'Command History' })
+vim.keymap.set('n', '<leader>n', function()
+  Snacks.picker.notifications()
+end, { desc = 'Notification History' })
+vim.keymap.set('n', '<leader>e', function()
+  Snacks.explorer()
+end, { desc = 'File Explorer' })
 
+-- find
+vim.keymap.set('n', '<leader>fb', function()
+  Snacks.picker.buffers()
+end, { desc = 'Buffers' })
+vim.keymap.set('n', '<leader>fc', function()
+  Snacks.picker.files { cwd = vim.fn.stdpath 'config' }
+end, { desc = 'Find Config File' })
+vim.keymap.set('n', '<leader>ff', function()
+  Snacks.picker.files()
+end, { desc = 'Find Files' })
+vim.keymap.set('n', '<leader>fg', function()
+  Snacks.picker.git_files()
+end, { desc = 'Find Git Files' })
+vim.keymap.set('n', '<leader>fp', function()
+  Snacks.picker.projects()
+end, { desc = 'Projects' })
+vim.keymap.set('n', '<leader>fr', function()
+  Snacks.picker.recent()
+end, { desc = 'Recent' })
+
+-- git
+vim.keymap.set('n', '<leader>gb', function()
+  Snacks.picker.git_branches()
+end, { desc = 'Git Branches' })
+vim.keymap.set('n', '<leader>gl', function()
+  Snacks.picker.git_log()
+end, { desc = 'Git Log' })
+vim.keymap.set('n', '<leader>gL', function()
+  Snacks.picker.git_log_line()
+end, { desc = 'Git Log Line' })
+vim.keymap.set('n', '<leader>gs', function()
+  Snacks.picker.git_status()
+end, { desc = 'Git Status' })
+vim.keymap.set('n', '<leader>gS', function()
+  Snacks.picker.git_stash()
+end, { desc = 'Git Stash' })
+vim.keymap.set('n', '<leader>gd', function()
+  Snacks.picker.git_diff()
+end, { desc = 'Git Diff (Hunks)' })
+vim.keymap.set('n', '<leader>gf', function()
+  Snacks.picker.git_log_file()
+end, { desc = 'Git Log File' })
+
+-- gh
+vim.keymap.set('n', '<leader>gi', function()
+  Snacks.picker.gh_issue()
+end, { desc = 'GitHub Issues (open)' })
+vim.keymap.set('n', '<leader>gI', function()
+  Snacks.picker.gh_issue { state = 'all' }
+end, { desc = 'GitHub Issues (all)' })
+vim.keymap.set('n', '<leader>gp', function()
+  Snacks.picker.gh_pr()
+end, { desc = 'GitHub Pull Requests (open)' })
+vim.keymap.set('n', '<leader>gP', function()
+  Snacks.picker.gh_pr { state = 'all' }
+end, { desc = 'GitHub Pull Requests (all)' })
+
+-- Grep
+vim.keymap.set('n', '<leader>sb', function()
+  Snacks.picker.lines()
+end, { desc = 'Buffer Lines' })
+vim.keymap.set('n', '<leader>sB', function()
+  Snacks.picker.grep_buffers()
+end, { desc = 'Grep Open Buffers' })
+vim.keymap.set('n', '<leader>sg', function()
+  Snacks.picker.grep()
+end, { desc = 'Grep' })
+vim.keymap.set({ 'n', 'x' }, '<leader>sw', function()
+  Snacks.picker.grep_word()
+end, { desc = 'Visual selection or word' })
+
+-- search
+vim.keymap.set('n', '<leader>s"', function()
+  Snacks.picker.registers()
+end, { desc = 'Registers' })
 vim.keymap.set('n', '<leader>s/', function()
-  builtin.live_grep {
-    grep_open_files = true,
-    prompt_title = 'Live Grep in Open Files',
-  }
-end, { desc = '[S]earch [/] in Open Files' })
+  Snacks.picker.search_history()
+end, { desc = 'Search History' })
+vim.keymap.set('n', '<leader>sa', function()
+  Snacks.picker.autocmds()
+end, { desc = 'Autocmds' })
+vim.keymap.set('n', '<leader>sb', function()
+  Snacks.picker.lines()
+end, { desc = 'Buffer Lines' })
+vim.keymap.set('n', '<leader>sc', function()
+  Snacks.picker.command_history()
+end, { desc = 'Command History' })
+vim.keymap.set('n', '<leader>sC', function()
+  Snacks.picker.commands()
+end, { desc = 'Commands' })
+vim.keymap.set('n', '<leader>sd', function()
+  Snacks.picker.diagnostics()
+end, { desc = 'Diagnostics' })
+vim.keymap.set('n', '<leader>sD', function()
+  Snacks.picker.diagnostics_buffer()
+end, { desc = 'Buffer Diagnostics' })
+vim.keymap.set('n', '<leader>sh', function()
+  Snacks.picker.help()
+end, { desc = 'Help Pages' })
+vim.keymap.set('n', '<leader>sH', function()
+  Snacks.picker.highlights()
+end, { desc = 'Highlights' })
+vim.keymap.set('n', '<leader>si', function()
+  Snacks.picker.icons()
+end, { desc = 'Icons' })
+vim.keymap.set('n', '<leader>sj', function()
+  Snacks.picker.jumps()
+end, { desc = 'Jumps' })
+vim.keymap.set('n', '<leader>sk', function()
+  Snacks.picker.keymaps()
+end, { desc = 'Keymaps' })
+vim.keymap.set('n', '<leader>sl', function()
+  Snacks.picker.loclist()
+end, { desc = 'Location List' })
+vim.keymap.set('n', '<leader>sm', function()
+  Snacks.picker.marks()
+end, { desc = 'Marks' })
+vim.keymap.set('n', '<leader>sM', function()
+  Snacks.picker.man()
+end, { desc = 'Man Pages' })
+vim.keymap.set('n', '<leader>sp', function()
+  Snacks.picker.lazy()
+end, { desc = 'Search for Plugin Spec' })
+vim.keymap.set('n', '<leader>sq', function()
+  Snacks.picker.qflist()
+end, { desc = 'Quickfix List' })
+vim.keymap.set('n', '<leader>sR', function()
+  Snacks.picker.resume()
+end, { desc = 'Resume' })
+vim.keymap.set('n', '<leader>su', function()
+  Snacks.picker.undo()
+end, { desc = 'Undo History' })
+vim.keymap.set('n', '<leader>uC', function()
+  Snacks.picker.colorschemes()
+end, { desc = 'Colorschemes' })
 
-vim.keymap.set('n', '<leader>sn', function()
-  builtin.find_files { cwd = vim.fn.stdpath 'config' }
-end, { desc = '[S]earch [N]eovim files' })
+-- LSP
+vim.keymap.set('n', 'grd', function()
+  Snacks.picker.lsp_definitions()
+end, { desc = 'Goto Definition' })
+vim.keymap.set('n', 'grD', function()
+  Snacks.picker.lsp_declarations()
+end, { desc = 'Goto Declaration' })
+vim.keymap.set('n', 'grr', function()
+  Snacks.picker.lsp_references()
+end, { nowait = true, desc = 'References' })
+vim.keymap.set('n', 'gri', function()
+  Snacks.picker.lsp_implementations()
+end, { desc = 'Goto Implementation' })
+vim.keymap.set('n', 'gy', function()
+  Snacks.picker.lsp_type_definitions()
+end, { desc = 'Goto T[y]pe Definition' })
+vim.keymap.set('n', 'gai', function()
+  Snacks.picker.lsp_incoming_calls()
+end, { desc = 'C[a]lls Incoming' })
+vim.keymap.set('n', 'gao', function()
+  Snacks.picker.lsp_outgoing_calls()
+end, { desc = 'C[a]lls Outgoing' })
+vim.keymap.set('n', '<leader>ss', function()
+  Snacks.picker.lsp_symbols()
+end, { desc = 'LSP Symbols' })
+vim.keymap.set('n', '<leader>sS', function()
+  Snacks.picker.lsp_workspace_symbols()
+end, { desc = 'LSP Workspace Symbols' })
 
 require('lazydev').setup {
   library = {
@@ -385,17 +521,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
       mode = mode or 'n'
       vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
     end
-
-    map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
-    map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-    map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-    map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-    map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-    map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-    map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
-    map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
-    map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
-
     -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
     ---@param client vim.lsp.Client
     ---@param method vim.lsp.protocol.Method
@@ -467,7 +592,6 @@ vim.diagnostic.config {
 local lua_ls_config = {
   settings = {
     Lua = {
-
       completion = {
         callSnippet = 'Replace',
       },
@@ -553,7 +677,7 @@ require('conform').setup {
           return { 'php_cs_fixer_v2' }
         end
       end
-      return { 'php-cs-fixer' }
+      return { 'php_cs_fixer' }
     end,
   },
   formatters = {
@@ -663,6 +787,8 @@ require('mini.ai').setup { n_lines = 500 }
 -- - sd'   - [S]urround [D]elete [']quotes
 -- - sr)'  - [S]urround [R]eplace [)] [']
 require('mini.surround').setup()
+require('mini.icons').setup()
+require('mini.pairs').setup()
 
 local statusline = require 'mini.statusline'
 statusline.setup { use_icons = vim.g.have_nerd_font }
@@ -703,7 +829,7 @@ require('nvim-treesitter.configs').setup {
     --  the list of additional_vim_regex_highlighting and disabled languages for indent.
     additional_vim_regex_highlighting = { 'ruby' },
     disable = function(lang, buf)
-      local max_filesize = 100 * 1024 -- 100 KB
+      local max_filesize = 1.5 * 1024 * 1024
       local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
       if ok and stats and stats.size > max_filesize then
         return true
@@ -729,7 +855,6 @@ vim.api.nvim_create_autocmd('PackChanged', {
 })
 
 require('guess-indent').setup {}
-require('nvim-autopairs').setup {}
 
 local lint = require 'lint'
 local phpstan = lint.linters.phpstan
