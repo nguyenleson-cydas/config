@@ -318,7 +318,7 @@ require('snacks').setup {
   input = { enabled = true },
   notifier = {
     enabled = true,
-    timeout = 3000,
+    timeout = 10000,
   },
   picker = { enabled = true },
   quickfile = { enabled = true },
@@ -780,16 +780,16 @@ require('nvim-treesitter.configs').setup {
     -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
     --  If you are experiencing weird indenting issues, add the language to
     --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-    additional_vim_regex_highlighting = { 'ruby' },
-    disable = function(lang, buf)
-      local max_filesize = 1.5 * 1024 * 1024
+    additional_vim_regex_highlighting = { 'ruby', 'php' },
+    disable = function(_, buf)
+      local max_filesize = 1.5 * 1024 * 1024 -- 1.5 MB
       local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
       if ok and stats and stats.size > max_filesize then
         return true
       end
     end,
   },
-  indent = { enable = true, disable = { 'ruby' } },
+  indent = { enable = true, disable = { 'ruby', 'php' } },
 }
 
 require('nvim-treesitter.configs').setup {
@@ -865,12 +865,12 @@ require('nvim-treesitter.configs').setup {
       -- Below will go to either the start or the end, whichever is closer.
       -- Use if you want more granular movements
       -- Make it even more gradual by adding multiple queries and regex.
-      goto_next = {
-        [']d'] = '@conditional.outer',
-      },
-      goto_previous = {
-        ['[d'] = '@conditional.outer',
-      },
+      -- goto_next = {
+      --   [']d'] = '@conditional.outer',
+      -- },
+      -- goto_previous = {
+      --   ['[d'] = '@conditional.outer',
+      -- },
     },
   },
 }
