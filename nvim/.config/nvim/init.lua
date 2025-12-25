@@ -41,6 +41,7 @@ vim.pack.add {
   'https://github.com/zbirenbaum/copilot.lua.git',
   'https://github.com/tpope/vim-dadbod.git',
   'https://github.com/folke/snacks.nvim.git',
+  'https://github.com/norcalli/nvim-colorizer.lua.git',
 }
 
 vim.g.mapleader = ' '
@@ -155,7 +156,7 @@ vim.keymap.set('n', '<leader>yP', function()
 end, { desc = '[Y]ank [P]ath (absolute)' })
 
 vim.keymap.set('n', '<leader>pu', function()
-  vim.pack.update(nil, { force = true })
+  vim.pack.update()
 end, { desc = '[P]ack [U]pdate' })
 
 vim.keymap.set('n', '<leader>pc', function()
@@ -364,43 +365,6 @@ vim.keymap.set('n', '<leader>fr', function()
   Snacks.picker.recent()
 end, { desc = 'Recent' })
 
--- git
-vim.keymap.set('n', '<leader>gb', function()
-  Snacks.picker.git_branches()
-end, { desc = 'Git Branches' })
-vim.keymap.set('n', '<leader>gl', function()
-  Snacks.picker.git_log()
-end, { desc = 'Git Log' })
-vim.keymap.set('n', '<leader>gL', function()
-  Snacks.picker.git_log_line()
-end, { desc = 'Git Log Line' })
-vim.keymap.set('n', '<leader>gs', function()
-  Snacks.picker.git_status()
-end, { desc = 'Git Status' })
-vim.keymap.set('n', '<leader>gS', function()
-  Snacks.picker.git_stash()
-end, { desc = 'Git Stash' })
-vim.keymap.set('n', '<leader>gd', function()
-  Snacks.picker.git_diff()
-end, { desc = 'Git Diff (Hunks)' })
-vim.keymap.set('n', '<leader>gf', function()
-  Snacks.picker.git_log_file()
-end, { desc = 'Git Log File' })
-
--- gh
-vim.keymap.set('n', '<leader>gi', function()
-  Snacks.picker.gh_issue()
-end, { desc = 'GitHub Issues (open)' })
-vim.keymap.set('n', '<leader>gI', function()
-  Snacks.picker.gh_issue { state = 'all' }
-end, { desc = 'GitHub Issues (all)' })
-vim.keymap.set('n', '<leader>gp', function()
-  Snacks.picker.gh_pr()
-end, { desc = 'GitHub Pull Requests (open)' })
-vim.keymap.set('n', '<leader>gP', function()
-  Snacks.picker.gh_pr { state = 'all' }
-end, { desc = 'GitHub Pull Requests (all)' })
-
 -- Grep
 vim.keymap.set('n', '<leader>sb', function()
   Snacks.picker.lines()
@@ -509,25 +473,40 @@ vim.keymap.set('n', '<leader>sS', function()
   Snacks.picker.lsp_workspace_symbols()
 end, { desc = 'LSP Workspace Symbols' })
 
--- Terminal (cwd)
-vim.keymap.set({ 'n', 't' }, '<leader>fT', function()
+-- Other
+vim.keymap.set('n', '<leader>z', function()
+  Snacks.zen()
+end, { desc = 'Toggle Zen Mode' })
+vim.keymap.set('n', '<leader>Z', function()
+  Snacks.zen.zoom()
+end, { desc = 'Toggle Zoom' })
+vim.keymap.set('n', '<leader>.', function()
+  Snacks.scratch()
+end, { desc = 'Toggle Scratch Buffer' })
+vim.keymap.set('n', '<leader>S', function()
+  Snacks.scratch.select()
+end, { desc = 'Select Scratch Buffer' })
+vim.keymap.set('n', '<leader>n', function()
+  Snacks.notifier.show_history()
+end, { desc = 'Notification History' })
+vim.keymap.set('n', '<leader>bd', function()
+  Snacks.bufdelete()
+end, { desc = 'Delete Buffer' })
+vim.keymap.set('n', '<leader>cR', function()
+  Snacks.rename.rename_file()
+end, { desc = 'Rename File' })
+vim.keymap.set({ 'n', 'v' }, '<leader>gB', function()
+  Snacks.gitbrowse()
+end, { desc = 'Git Browse' })
+vim.keymap.set('n', '<leader>un', function()
+  Snacks.notifier.hide()
+end, { desc = 'Dismiss All Notifications' })
+vim.keymap.set('n', '<c-/>', function()
   Snacks.terminal()
-end, { desc = 'Terminal (cwd)', noremap = true })
-
--- Terminal (Root Dir)
-vim.keymap.set({ 'n', 't' }, '<leader>ft', function()
-  Snacks.terminal(nil, { cwd = vim.fn.getcwd() })
-end, { desc = 'Terminal (Root Dir)', noremap = true })
-
--- Toggle Terminal
-vim.keymap.set({ 'n', 't' }, '<c-/>', function()
+end, { desc = 'Toggle Terminal' })
+vim.keymap.set('n', '<c-_>', function()
   Snacks.terminal()
-end, { desc = 'Toggle Terminal', noremap = true })
-
--- which_key_ignore (Root Dir) — normal mode
-vim.keymap.set({ 'n', 't' }, '<c-_>', function()
-  Snacks.terminal(nil, { cwd = vim.fn.getcwd() })
-end, { desc = 'which_key_ignore', noremap = true })
+end, { desc = 'which_key_ignore' })
 
 require('lazydev').setup {
   library = {
@@ -1194,6 +1173,8 @@ end
 
 vim.api.nvim_set_hl(0, 'BlinkCmpMenu', { link = 'NormalFloat' })
 vim.api.nvim_set_hl(0, 'BlinkCmpMenuBorder', { link = 'NormalFloat' })
+
+require('colorizer').setup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
