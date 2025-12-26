@@ -25,7 +25,7 @@ tmux:
     deletions: " "
   styles:
     state: "#[fg=#DC322F,nobold]"
-    branch: "#[fg=#93A1A1,italics]"
+    branch: "#[fg=#576D74,italics]"
     staged: "#[fg=#859900,nobold]"
     conflict: "#[fg=#DC322F,nobold]"
     modified: "#[fg=#B58900,nobold]"

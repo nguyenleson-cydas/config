@@ -873,15 +873,19 @@ require('incline').setup {
     local path_label = build_path_label()
     local is_modified = vim.bo[props.buf].modified
 
-    local result = {}
     local diagnostic_labels = get_diagnostic_label()
     local git_diff_labels = get_git_diff()
+    local has_diagnostics = #diagnostic_labels > 0
+    local has_git_diff = #git_diff_labels > 0
 
+    local result = {}
     table.insert(result, { (ft_icon or '') .. ' ', guifg = ft_color, guibg = 'none' })
     table.insert(result, { filename, gui = is_modified and 'bold,italic' or 'bold' })
     if path_label then
       table.insert(result, { '  ', path_label, group = 'Comment' })
-      table.insert(result, { ' ┊ ' })
+      if has_diagnostics or has_git_diff then
+        table.insert(result, { ' ┊ ' })
+      end
     end
 
     for _, label in ipairs(diagnostic_labels) do
@@ -891,7 +895,7 @@ require('incline').setup {
       table.insert(result, label)
     end
 
-    table.insert(result, { '  ┊  ' .. vim.api.nvim_win_get_number(props.win), group = 'DevIconWindows' })
+    table.insert(result, { '┊  ' .. vim.api.nvim_win_get_number(props.win), group = 'DevIconWindows' })
 
     return result
   end,
