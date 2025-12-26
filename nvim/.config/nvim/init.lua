@@ -847,9 +847,6 @@ require('incline').setup {
           table.insert(labels, { icon .. signs[name] .. ' ', group = 'Diff' .. name })
         end
       end
-      if #labels > 0 then
-        table.insert(labels, { '┊ ' })
-      end
       return labels
     end
 
@@ -876,15 +873,27 @@ require('incline').setup {
     local path_label = build_path_label()
     local is_modified = vim.bo[props.buf].modified
 
-    return {
-      { get_diagnostic_label() },
-      { get_git_diff() },
-      { (ft_icon or '') .. ' ', guifg = ft_color, guibg = 'none' },
-      { filename, gui = is_modified and 'bold,italic' or 'bold' },
-      -- Path immediately to the right of the filename
-      path_label and { '  ', path_label, group = 'Comment' } or '',
-      { '  ┊  ' .. vim.api.nvim_win_get_number(props.win), group = 'DevIconWindows' },
-    }
+    local result = {}
+    local diagnostic_labels = get_diagnostic_label()
+    local git_diff_labels = get_git_diff()
+
+    table.insert(result, { (ft_icon or '') .. ' ', guifg = ft_color, guibg = 'none' })
+    table.insert(result, { filename, gui = is_modified and 'bold,italic' or 'bold' })
+    if path_label then
+      table.insert(result, { '  ', path_label, group = 'Comment' })
+      table.insert(result, { ' ┊ ' })
+    end
+
+    for _, label in ipairs(diagnostic_labels) do
+      table.insert(result, label)
+    end
+    for _, label in ipairs(git_diff_labels) do
+      table.insert(result, label)
+    end
+
+    table.insert(result, { '  ┊  ' .. vim.api.nvim_win_get_number(props.win), group = 'DevIconWindows' })
+
+    return result
   end,
 }
 
