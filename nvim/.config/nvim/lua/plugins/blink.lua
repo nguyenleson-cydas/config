@@ -1,4 +1,5 @@
 vim.pack.add {
+  'https://github.com/zbirenbaum/copilot.lua.git',
   'https://github.com/rafamadriz/friendly-snippets.git',
   {
     src = 'https://github.com/L3MON4D3/LuaSnip.git',
@@ -8,6 +9,12 @@ vim.pack.add {
     src = 'https://github.com/saghen/blink.cmp.git',
     version = vim.version.range '^1',
   },
+  'https://github.com/giuxtaposition/blink-cmp-copilot.git',
+}
+
+require('copilot').setup {
+  suggestion = { enabled = false },
+  panel = { enabled = false },
 }
 
 local group = vim.api.nvim_create_augroup('BlinkCmpLazyLoad', { clear = true })
@@ -40,7 +47,7 @@ vim.api.nvim_create_autocmd('InsertEnter', {
         },
       },
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        default = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' },
         per_filetype = {
           sql = { 'snippets', 'dadbod', 'buffer' },
           mysql = { 'snippets', 'dadbod', 'buffer' },
@@ -48,6 +55,12 @@ vim.api.nvim_create_autocmd('InsertEnter', {
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
           dadbod = { module = 'vim_dadbod_completion.blink' },
+          copilot = {
+            name = 'copilot',
+            module = 'blink-cmp-copilot',
+            score_offset = 100,
+            async = true,
+          },
         },
       },
       cmdline = {
@@ -113,20 +126,5 @@ vim.api.nvim_create_autocmd('ColorScheme', {
     local c = require('solarized-osaka.colors').setup()
     vim.api.nvim_set_hl(0, 'BlinkCmpMenu', { fg = c.base01, bg = c.none })
     vim.api.nvim_set_hl(0, 'BlinkCmpMenuBorder', { fg = c.base02, bg = c.bg_float })
-  end,
-})
-
-vim.api.nvim_create_autocmd('User', {
-  pattern = 'BlinkCmpMenuOpen',
-  callback = function()
-    require('copilot.suggestion').dismiss()
-    vim.b.copilot_suggestion_hidden = true
-  end,
-})
-
-vim.api.nvim_create_autocmd('User', {
-  pattern = 'BlinkCmpMenuClose',
-  callback = function()
-    vim.b.copilot_suggestion_hidden = false
   end,
 })
