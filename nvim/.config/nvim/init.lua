@@ -864,9 +864,6 @@ require('incline').setup {
           table.insert(label, { icon .. n .. ' ', group = 'DiagnosticSign' .. severity })
         end
       end
-      if #label > 0 then
-        table.insert(label, { '┊ ' })
-      end
       return label
     end
 
@@ -889,9 +886,10 @@ require('incline').setup {
     end
 
     for _, label in ipairs(diagnostic_labels) do
-      if has_git_diff then
-        table.insert(result, label)
-      end
+      table.insert(result, label)
+    end
+    if has_git_diff then
+      table.insert(result, { '┊ ' })
     end
     for _, label in ipairs(git_diff_labels) do
       table.insert(result, label)
