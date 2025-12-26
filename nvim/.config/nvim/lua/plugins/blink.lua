@@ -43,7 +43,7 @@ vim.api.nvim_create_autocmd('InsertEnter', {
       snippets = { preset = 'luasnip' },
       -- See :h blink-cmp-config-fuzzy for more information
       fuzzy = { implementation = 'prefer_rust_with_warning' },
-      signature = { enabled = true },
+      -- signature = { enabled = true },
     }
   end,
 })
@@ -85,8 +85,8 @@ vim.api.nvim_create_autocmd('PackChanged', {
 vim.api.nvim_create_autocmd('ColorScheme', {
   pattern = '*',
   callback = function()
-    vim.api.nvim_set_hl(0, 'BlinkCmpMenu', { link = 'NONE' })
-    vim.api.nvim_set_hl(0, 'BlinkCmpMenuBorder', { link = 'NONE' })
-    vim.api.nvim_set_hl(0, 'FloatBorder', { bg = 'NONE' })
+    local c = require('solarized-osaka.colors').setup()
+    vim.api.nvim_set_hl(0, 'BlinkCmpMenu', { fg = c.base01, bg = c.none })
+    vim.api.nvim_set_hl(0, 'BlinkCmpMenuBorder', { fg = c.base02, bg = c.bg_float })
   end,
 })

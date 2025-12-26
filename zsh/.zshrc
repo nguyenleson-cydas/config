@@ -96,3 +96,27 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
 export PATH="/Users/fre_nguyen_s/.config/herd-lite/bin:$PATH"
 export PHP_INI_SCAN_DIR="/Users/fre_nguyen_s/.config/herd-lite/bin:$PHP_INI_SCAN_DIR"
+
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+  --highlight-line \
+  --info=inline-right \
+  --ansi \
+  --layout=reverse \
+  --border=none
+  --color=bg+:#002c38 \
+  --color=bg:#001419 \
+  --color=border:#063540 \
+  --color=fg:#9eabac \
+  --color=gutter:#001419 \
+  --color=header:#c94c16 \
+  --color=hl+:#c94c16 \
+  --color=hl:#c94c16 \
+  --color=info:#637981 \
+  --color=marker:#c94c16 \
+  --color=pointer:#c94c16 \
+  --color=prompt:#c94c16 \
+  --color=query:#9eabac:regular \
+  --color=scrollbar:#063540 \
+  --color=separator:#063540 \
+  --color=spinner:#c94c16 \
+"

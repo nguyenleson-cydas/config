@@ -85,3 +85,6 @@ vim.keymap.set('n', '<leader>pc', function()
     end
   end)
 end, { desc = '[P]ack [C]lean' })
+
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Move up half page and center' })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Move down half page and center' })

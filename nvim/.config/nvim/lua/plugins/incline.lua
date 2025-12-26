@@ -87,7 +87,7 @@ require('incline').setup {
       table.insert(result, label)
     end
 
-    table.insert(result, { '┊  ' .. vim.api.nvim_win_get_number(props.win), group = 'DevIconWindows' })
+    table.insert(result, { ' ┊  ' .. vim.api.nvim_win_get_number(props.win), group = 'DevIconWindows' })
 
     return result
   end,
