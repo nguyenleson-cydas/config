@@ -10,58 +10,26 @@ require('lualine').setup {
   winbar = {
     lualine_c = {
       { 'filetype', icon_only = true, colored = true, padding = { left = 2, right = 0 } },
-      { 'filename', newfile_status = false, symbols = { unnamed = '[No Name]' }, padding = { left = 1, right = 1 } },
+      { 'filename', path = 0, padding = { left = 1, right = 1 } },
       {
         function()
           local bufname = vim.api.nvim_buf_get_name(0)
           if bufname == '' then
             return ''
           end
-          local dir_abs = vim.fn.fnamemodify(bufname, ':p:h')
-          local shortened = vim.fn.pathshorten(dir_abs)
-          return '' .. ((shortened ~= '' and shortened) or dir_abs)
+          local relative_path = vim.fn.fnamemodify(bufname, ':~:.')
+          local dir_relative = vim.fn.fnamemodify(relative_path, ':h')
+          return dir_relative
         end,
         color = 'Comment',
       },
       {
-        function()
-          return '┊'
-        end,
-        cond = function()
-          local has_diag = vim.tbl_count(vim.diagnostic.get(0)) > 0
-          local signs = vim.b.gitsigns_status_dict
-          local has_diff = signs and ((signs.added or 0) + (signs.changed or 0) + (signs.removed or 0) > 0)
-          return has_diag or has_diff
-        end,
-      },
-      {
         'diagnostics',
-        sections = { 'error', 'warn', 'info', 'hint' },
         symbols = { error = '󰅚 ', warn = '󰀪 ', info = '󰋽 ', hint = '󰌶 ' },
-        colored = true,
-      },
-      {
-        function()
-          return '┊'
-        end,
-        cond = function()
-          local has_diag = vim.tbl_count(vim.diagnostic.get(0)) > 0
-          local signs = vim.b.gitsigns_status_dict
-          local has_diff = signs and ((signs.added or 0) + (signs.changed or 0) + (signs.removed or 0) > 0)
-          return has_diag and has_diff
-        end,
       },
       {
         'diff',
         symbols = { added = ' ', modified = ' ', removed = ' ' },
-        colored = true,
-        source = function()
-          local s = vim.b.gitsigns_status_dict
-          if not s then
-            return nil
-          end
-          return { added = s.added, modified = s.changed, removed = s.removed }
-        end,
       },
       {
         function()
@@ -71,5 +39,38 @@ require('lualine').setup {
       },
     },
   },
-  inactive_winbar = {},
+  inactive_winbar = {
+    lualine_c = {
+      { 'filetype', icon_only = true, colored = false, padding = { left = 2, right = 0 } },
+      { 'filename', path = 0, padding = { left = 1, right = 1 } },
+      {
+        function()
+          local bufname = vim.api.nvim_buf_get_name(0)
+          if bufname == '' then
+            return ''
+          end
+          local relative_path = vim.fn.fnamemodify(bufname, ':~:.')
+          local dir_relative = vim.fn.fnamemodify(relative_path, ':h')
+          return dir_relative
+        end,
+        color = { fg = '#576D74', bg = '#002C38', gui = 'italic' },
+      },
+      {
+        'diagnostics',
+        symbols = { error = '󰅚 ', warn = '󰀪 ', info = '󰋽 ', hint = '󰌶 ' },
+        colored = false,
+      },
+      {
+        'diff',
+        symbols = { added = ' ', modified = ' ', removed = ' ' },
+        colored = false,
+      },
+      {
+        function()
+          return '┊  ' .. vim.api.nvim_win_get_number(0)
+        end,
+        color = { fg = '#576D74', bg = '#002C38' },
+      },
+    },
+  },
 }
