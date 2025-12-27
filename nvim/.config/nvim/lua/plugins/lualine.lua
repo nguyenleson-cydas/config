@@ -42,7 +42,7 @@ require('lualine').setup {
       },
       {
         function()
-          return '┊ '
+          return '┊'
         end,
         cond = function()
           local has_diag = vim.tbl_count(vim.diagnostic.get(0)) > 0
@@ -65,7 +65,7 @@ require('lualine').setup {
       },
       {
         function()
-          return ' ┊  ' .. vim.api.nvim_win_get_number(0)
+          return '┊  ' .. vim.api.nvim_win_get_number(0)
         end,
         color = 'DevIconWindows',
       },
